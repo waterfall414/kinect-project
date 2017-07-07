@@ -6,7 +6,7 @@ $(document).ready(function () {
       clientActive = false; // lock the client until server responds
     }
   });
-
+/*
   $("#gt").click(function () {
     socket.emit('dataLabelFromClient', 1);
   });
@@ -18,7 +18,7 @@ $(document).ready(function () {
   $("#re").click(function () {
     socket.emit('dataLabelFromClient', 3);
   });
-
+*/
   $("#report").click(function () {
     console.log('report button pressed!');
     location.href = "report.html";

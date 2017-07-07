@@ -23,7 +23,7 @@ if(kinect.open()) {
 
 	// Data Storage, global variables in server
 	var	bufferTrial= [], // trial is a number of activities, including ground truth (gt) and exercises
-			bufferBodyFrames =[], gtArray = [], exArray = [];
+			bufferBodyFrames =[], gtArray = [], exArray = [], bufferID = [], bufferLabels = [];
 
 	// Start Time for the test
 	var startTime, duration;
@@ -73,12 +73,13 @@ if(kinect.open()) {
 			}
 		});
 		// Speical Buttons: label buttons(3), report button(1), save(1) & curve show(1)
-		socket.on('dataLabelFromClient',function(num){ // label reference, exercise or discard
+		socket.on('dataLabelFromClient',function(num,label){ // label reference, exercise or discard
 			testID = bufferTrial.length-1;
-			if (gtArray[gtArray.length-1] == testID) { gtArray.pop(); }
-			if (exArray[exArray.length-1] == testID) { exArray.pop(); }
-						if (num == 1) { gtArray.push(testID); }
-			else{	if (num == 2) { exArray.push(testID); } }
+			if (gtArray[gtArray.length-1] == testID) { gtArray.pop(); bufferID.pop(); bufferLabels.pop();}
+			if (exArray[exArray.length-1] == testID) { exArray.pop(); bufferID.pop(); bufferLabels.pop();}
+
+			if (num == 1) { gtArray.push(testID); bufferID.push(testID); bufferLabels.push(label); }
+			else{	if (num == 2) { exArray.push(testID); } bufferID.push(testID); bufferLabels.push(label);}
 			activityLabeled = true;
 			socket.emit('serverDataLabeled');
 			socket.broadcast.emit('serverDataLabeled');
@@ -92,7 +93,9 @@ if(kinect.open()) {
     });
 
 		socket.on('saveRequest',function(filename){
-			save2xlsx(bufferTrial,gtArray,exArray,filename);
+			console.log("Tmp: bufferLabels:");
+			console.log(bufferLabels);
+			save2xlsx(bufferTrial, gtArray, exArray, bufferID, bufferLabels, filename);
 		});
 
 		socket.on('curveRequest',function(gtInd,exInd,jt,datatype){
@@ -244,17 +247,22 @@ function getOrientation(bufferTrial,id,jt){
     return lean;
   }
 
-function save2xlsx(bufferTrial, gtArray, exArray, filename){
+function save2xlsx(bufferTrial, gtArray, exArray, bufferID, bufferLabels, filename){
 
 	var wb = new Workbook(); //Create new wb object
+
+	var ws_info = sheet_info(bufferID, bufferLabels, "General Info");
+	wb.SheetNames.push("General Info");
+	wb.Sheets["General Info"] = ws_info;
+	
 	for (var i in gtArray){
-	    var ws_name = "GT_"+(i).toString();
+	    var ws_name = gtArray[i].toString();
 			var ws = sheet_from_bufferTrial(bufferTrial[gtArray[i]], ws_name);
 			wb.SheetNames.push(ws_name);
 			wb.Sheets[ws_name] = ws;
 	  }
 		for (var i in exArray){
-		    var ws_name = "EX_"+(i).toString();
+		    var ws_name = exArray[i].toString();
 				var ws = sheet_from_bufferTrial(bufferTrial[exArray[i]], ws_name);
 				wb.SheetNames.push(ws_name);
 				wb.Sheets[ws_name] = ws;
@@ -267,9 +275,27 @@ function Workbook() {
     this.SheetNames = [];
     this.Sheets = {};
 }
+
+function sheet_info(bufferID, bufferLabels, ws_name){
+	var ws = {};
+	var range = {s: {c:0, r:0}, e: {c:2, r:bufferLabels.length}};
+	for (var R=0; R<bufferLabels.length; R++){
+		var C = 0;
+		var cellID = {v: bufferID[R], t:'n'};
+		var cellID_ref = XLSX.utils.encode_cell({c:C,r:R});
+		ws[cellID_ref] = cellID;
+		C = 1;
+		var cellLabel = {v: bufferLabels[R], t:'s'};
+		var cellLabel_ref = XLSX.utils.encode_cell({c:C,r:R});
+		ws[cellLabel_ref] = cellLabel;
+	}
+	ws['!ref'] = XLSX.utils.encode_range(range);
+	return ws;
+}
+
 function sheet_from_bufferTrial(bufferBodyFrames, ws_name) {
     var ws = {};
-    var range = {s: {c:0, r:0}, e: {c:275, r:500 }};
+		var range = {s: {c:0, r:0}, e: {c:275, r:bufferBodyFrames.length }};
 		skeleton = 0; //Track which skeleton # it is out of the maximum 6
 		for(var i = 0; i < bufferBodyFrames[0].bodies.length; i++){
 			if(bufferBodyFrames[0].bodies[i].tracked){
@@ -293,6 +319,7 @@ function sheet_from_bufferTrial(bufferBodyFrames, ws_name) {
 						}
 		    }
 			}
+
 		ws['!ref'] = XLSX.utils.encode_range(range);
     return ws;
 }

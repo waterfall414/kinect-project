@@ -33,9 +33,19 @@
 	</div>
 	<br>
 	<div id = "display">
-<input id ="gt" class="button-shadow-small" type="button"  value="Reference"/>
-<input id = "ex" class = "button-shadow-small" type="button" value="Exercise"/>
-<input id = "re" class= "button-shadow-small" type="button" value = "Discard"/>
+	<input id ="gt" class="button-shadow-small" type="button"  value="Reference" onclick = "socket.emit('dataLabelFromClient', 1, &quot;Reference&quot;);"/>
+	<input id = "ex" class = "button-shadow-small" type="button" value="Exercise" onclick = "socket.emit('dataLabelFromClient', 2, &quot;Exercise&quot;);"/>
+	<input id = "re" class= "button-shadow-small" type="button" value = "Discard" onclick = "socket.emit('dataLabelFromClient', 3, &quot;Discard&quot;);"/>
+
+	<br>
+	<input id ="shoulder" class="button-shadow-small" type="button"  value="Shoulder" onclick = "socket.emit('dataLabelFromClient', 2, &quot;Exercise: Shoulder Mistake&quot;);"/>
+	<input id = "elbow" class = "button-shadow-small" type="button" value="Elbow" onclick = "socket.emit('dataLabelFromClient', 2, &quot;Exercise: Shoulder Mistake&quot;);"/>
+	<input id = "hip" class= "button-shadow-small" type="button" value = "Hip" onclick = "socket.emit('dataLabelFromClient', 2, &quot;Exercise: Hip Mistake&quot;);"/>
+	<br>
+	<input id ="knee" class="button-shadow-small" type="button"  value="Knee" onclick = "socket.emit('dataLabelFromClient', 2, &quot;Exercise: Knee Mistake&quot;);"/>
+	<input id = "ankle" class = "button-shadow-small" type="button" value="Ankle" onclick = "socket.emit('dataLabelFromClient', 2, &quot;Exercise: Ankle Mistake&quot;);"/>
+	<input id = "angle" class= "button-shadow-small" type="button" value = "Straight" onclick = "socket.emit('dataLabelFromClient', 2, &quot;Exercise: Joints bent Mistake&quot;);"/>
+
 	</div>
 	<br>
 

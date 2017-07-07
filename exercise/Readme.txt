@@ -11,7 +11,7 @@ I. Server Initiation (Code 3)
 ✓	S-b->C 'init' & systemState (constantly triggered by 'bodyFrame')
 
 	Client:
-	unlock (clientActive = true)
+✓	unlock (clientActive = true)
 ✓	change Text Label to 'Start' label
 ✓	liveupdateCanvas1()
 
@@ -21,9 +21,9 @@ Trigger:	C->S 'command', lock (clientActive = false)
 
 Server
 ✓	bufferBodyFrames = [];
-	Check the number of bodies in FOV
+✓	Check the number of bodies in FOV
 Client
-	Lock the tracking object to the specific body
+✓	Lock the tracking object to the specific body
 --------------------------------------------------------------------------------
 II. Recording (Rec, Code 1)
 Server
@@ -37,7 +37,7 @@ Server
 ✓	Client: Change Text Label to 'Stop' label
 
 Client
-	unlock (clientActive = true)
+✓	unlock (clientActive = true)
 ✓	liveupdateCanvas1()
 
 --------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ Server
 
 -----------------------------------------------------
 
-III. Result Display ('disp', Code 2)
+III. Result Display ('disp', Code 2) & Labelling
 Server
 
 ✓	S-b->C: 'disp' & bufferBodyFrames & typeofTest & currentrecordid
@@ -60,7 +60,7 @@ Server
 ✓	unlock (clientActive = true) (1 time)
 ✓	C: animateCanvas1()
 
-✓	C->S: 'choose',pushto(gtarray) or pushto(exarray)
+✓	C->S: "dataLabelFromClient" and label tags
 ✓	S->b->C: 'labeled'
 ✓	S->C: 'labeled'
 
